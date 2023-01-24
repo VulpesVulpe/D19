@@ -1,0 +1,62 @@
+{% extends 'flatpages/default.html' %} 
+{% load custom_tags %}
+{% load custom_filters %}
+{% load cache %}
+
+
+
+{% block title %}
+Posts
+{% endblock title %}
+
+{% block content %}
+<h1>Все публикации</h1>
+
+   <h3> Всего публикаций: {{ posts|length }}</h3>
+   <hr>
+       <form action="{% url 'post_search' %}" method="get">
+           <input type="button" value="Поиск по критериям" onClick='location.href="http://127.0.0.1:8000/board/search/"'>
+           <input type="button" value="Добавить публикацию" onClick='location.href="http://127.0.0.1:8000/board/create/"'>
+           <input type="button" value="Войти в систему" onClick='location.href="http://127.0.0.1:8000/accounts/login/"'>
+           <input type="button" value="Регистрация" onClick='location.href="http://127.0.0.1:8000/accounts/signup/"'>
+       </form>
+   <hr>
+   {% if posts %}
+       <table>
+           <tr>
+               <td>Заголовок</td>
+               <td>Дата публикации</td>
+               <td>Текст публикации</td>
+           </tr>
+
+           {% for post in posts %}
+           <tr>
+               <td><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></td>
+               <td>{{ post.date|date:"d.m.Y" }}</td>
+               <td>{{ post.text|truncatewords:20|safe }}</td>
+           </tr>
+           {% endfor %}
+
+       </table>
+   {% else %}
+       <h2>Объявлений нет!</h2>
+   {% endif %}
+
+   {% if page_obj.has_previous %}
+       <a href="?{% url_replace page=1 %}">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {{ page_obj.number }}
+
+   {% if page_obj.has_next %}
+       <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+{% endblock content %}

@@ -1,0 +1,43 @@
+{% extends 'flatpages/default.html' %}
+{% block title %}
+Post
+{% endblock title %}
+
+{% block content %}
+<h1>{{ post.title }}</h1>
+<hr>
+<h2> Дата публикации: {{post.date|date:"d.m.Y" }}</h2><h2>Категория публикации: {{ post.category.get }}</h2>
+<hr>
+    {% if post.category.all %}
+    <h5>Категории:</h5>
+        {% for i in post.category.all %}
+            {{ i }}{% if not request.user.is_authenticated %}
+                <button><a href="http://127.0.0.1:8000/accounts/login/"> Подписаться </a></button>
+            {% elif i not in subscribes %}
+                <button> <a href="{% url 'subscribe' i.pk %}"> Подписаться </a></button>
+            {% else %}
+                <h6>Вы подписаны на эту категорию</h6>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+<hr>
+    <h3>{{ post.text|safe }}</h3>
+
+<br/><br/>
+
+<h5>Комментарии</h5>
+
+{% if not post.comments.all %}
+          Ещё никто не оставил свой комментарий
+        <a href="{% url 'add_comment' post.pk %}">Добавить</a>
+{% else %}
+
+        {% for comment in post.comments.all %}
+                <br/>
+                    {{ comment.text }}
+        {% endfor %}
+<br/>
+    <a href="{% url 'add_comment' post.pk %}">Добавить комментарий</a>
+{% endif %}
+<br/><br/>
+{% endblock content %}
